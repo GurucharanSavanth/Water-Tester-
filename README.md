@@ -2,7 +2,7 @@
 
 ## [Click here for Calculator](https://gurucharansavanth.github.io/Seachem-Dosing-Calculator/)
 
-[![Live Demo](https://img.shields.io/badge/demo-online-brightgreen.svg)](https://gurucharansavanth.github.io/Seachem-Dosing-Calculator/)
+[![Live Demo](https://img.shields.io/badge/demo-online-brightgreen.svg)](https://gurucharansavanth.github.io/Water-Tester-/)
 
 > **A fast, accessible calculator for precise Seachem and DIY supplement dosing — now with dark mode, bilingual UI (English ⇄ Kannada), and full CI automation.**
 
@@ -156,3 +156,4 @@ All equations are unit‑tested against manufacturer tables and stoichiometric c
 ---
 
 > *Not affiliated with Seachem — this is a community tool. Use at your own risk and always double‑check critical doses.*
+
