@@ -1336,13 +1336,19 @@ body.dark .sub-unit-btn {
 
 /* Scale-select sits flush next to the number input */
 #dynamicCalculators .input-wrapper {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.5rem;
 }
 #dynamicCalculators .input-wrapper .styled-input {
-    flex: 1;
+    width: 100%;
     min-width: 0;
+}
+#dynamicCalculators .input-wrapper .scale-select {
+    width: auto;
+    min-width: 5.5rem;
+    max-width: 7rem;
 }
 
 /* --- v6.0: RESPONSIVE --- */
