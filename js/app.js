@@ -1,13 +1,106 @@
-// js/app.js v6.0
+// js/app.js v6.1
+
+const LOADING_SCREEN_MIN_DURATION_MS = 5000;
+const LOADING_SCREEN_FADE_MS = 550;
+const loadingScreenStartTime = Date.now();
+const loadingLogTimers = [];
+const LOADING_LOG_STEPS = [
+    { delay: 90, level: 'BOOT', message: 'Starting aquarium runtime bootstrap sequence...' },
+    { delay: 260, level: 'INFO', message: 'Binding loader telemetry channel and heartbeat monitors.' },
+    { delay: 520, level: 'INFO', message: 'Resolving local configuration manifest and safety limits.' },
+    { delay: 820, level: 'INFO', message: 'Validating persisted UI state from local storage cache.' },
+    { delay: 1120, level: 'INFO', message: 'Mounting translation cache for en-US and kn-IN bundles.' },
+    { delay: 1470, level: 'INFO', message: 'Attaching DOM references for controls, cards, and status panels.' },
+    { delay: 1820, level: 'INFO', message: 'Initializing dosing API adapters for Seachem and salt-mix engines.' },
+    { delay: 2220, level: 'INFO', message: 'Hydrating profile defaults for freshwater, saltwater, and pond modes.' },
+    { delay: 2620, level: 'INFO', message: 'Registering recommendation ruleset and parameter watchdogs.' },
+    { delay: 3040, level: 'INFO', message: 'Priming unit converters for litres, gallons, dKH, and dGH.' },
+    { delay: 3460, level: 'INFO', message: 'Warming calculation pipelines and scheduling initial render pass.' },
+    { delay: 3920, level: 'INFO', message: 'Syncing emergency alert renderer and live badge channel.' },
+    { delay: 4360, level: 'INFO', message: 'Running final dependency health check and readiness probe.' },
+    { delay: 4720, level: 'READY', message: 'API initialization complete. Runtime ready for water analysis.' }
+];
+
+function formatLoadingLogTimestamp(epochMs) {
+    const date = new Date(epochMs);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+    return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+}
+
+function appendLoadingLogLine(stream, entry, timestampMs) {
+    if (!stream || !stream.isConnected) return;
+
+    const line = document.createElement('div');
+    line.className = `loading-log-line level-${entry.level.toLowerCase()}`;
+
+    const time = document.createElement('span');
+    time.className = 'loading-log-time';
+    time.textContent = formatLoadingLogTimestamp(timestampMs);
+
+    const level = document.createElement('span');
+    level.className = 'loading-log-level';
+    level.textContent = entry.level;
+
+    const message = document.createElement('span');
+    message.className = 'loading-log-message';
+    message.textContent = entry.message;
+
+    line.append(time, level, message);
+    stream.appendChild(line);
+    stream.scrollTop = stream.scrollHeight;
+}
+
+function startLoadingScreenBootLog() {
+    const loadingScreen = document.getElementById('loadingScreen');
+    const stream = document.getElementById('loadingLogStream');
+    if (!loadingScreen || !stream || loadingScreen.dataset.logStarted === 'true') return;
+
+    loadingScreen.dataset.logStarted = 'true';
+    stream.innerHTML = '';
+
+    LOADING_LOG_STEPS.forEach((entry) => {
+        const timerId = window.setTimeout(() => {
+            appendLoadingLogLine(stream, entry, loadingScreenStartTime + entry.delay);
+        }, entry.delay);
+        loadingLogTimers.push(timerId);
+    });
+}
+
+function dismissLoadingScreen() {
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (!loadingScreen || loadingScreen.dataset.dismissScheduled === 'true') return;
+
+    loadingScreen.dataset.dismissScheduled = 'true';
+    const elapsed = Date.now() - loadingScreenStartTime;
+    const remainingDelay = Math.max(0, LOADING_SCREEN_MIN_DURATION_MS - elapsed);
+
+    window.setTimeout(() => {
+        if (!loadingScreen.parentNode) return;
+
+        loadingScreen.setAttribute('aria-hidden', 'true');
+        loadingScreen.classList.add('fade-out');
+
+        window.setTimeout(() => {
+            while (loadingLogTimers.length > 0) {
+                clearTimeout(loadingLogTimers.pop());
+            }
+            if (loadingScreen.parentNode) {
+                loadingScreen.remove();
+            }
+        }, LOADING_SCREEN_FADE_MS);
+    }, remainingDelay);
+}
 
 /**
- * Main calculation logic for dosing. Orchestrates input gathering,
- * validation, calculation, and result display.
+ * Main calculation orchestrator. Gathers inputs, validates,
+ * runs all calculation functions, and updates UI.
  */
 function doDosingCalculations() {
     const userInputs = getAllInputValues();
     const errorMessages = [];
-    const t = (key) => translations[currentLang][key] || key;
 
     const litres = getEffectiveVolumeLitres();
 
@@ -37,7 +130,7 @@ function doDosingCalculations() {
 
     const results = {};
 
-    // --- Legacy Calculations (dosingCalculations.js — untouched) ---
+    // --- Legacy Calculations ---
     results.khDose = calculateKhco3Grams(userInputs.khCurrent, userInputs.khTarget, litres, userInputs.khPurity);
 
     const deltaGh = userInputs.ghTarget - userInputs.ghCurrent;
@@ -53,7 +146,7 @@ function doDosingCalculations() {
     results.acidBufferDose = calculateAcidBufferGrams(litres, userInputs.acidCurrentKh, userInputs.acidTargetKh);
     results.goldBufferResult = calculateGoldBufferGrams(litres, userInputs.phGoldCurrent, userInputs.phGoldTarget);
 
-    // --- v6.0: SeachemEngine dynamic product calculations ---
+    // --- SeachemEngine dynamic calculations ---
     results.dynamicResults = {};
     if (window.SeachemEngine) {
         window.SeachemEngine.PRODUCT_CONFIGS.forEach(cfg => {
@@ -65,19 +158,17 @@ function doDosingCalculations() {
                 current = curEl ? parseFloatSafe(curEl.value) : 0;
                 target = tgtEl ? parseFloatSafe(tgtEl.value) : 0;
 
-                // Read scale from dropdown if available
                 if (cfg.unitScales) {
                     const scaleEl = document.getElementById('dyn_' + cfg.id + '_scale');
                     if (scaleEl) scale = scaleEl.value;
                 }
             }
-            // volume_only products don't need current/target
 
             results.dynamicResults[cfg.id] = window.SeachemEngine.calculate(cfg.id, current, target, litres, scale);
         });
     }
 
-    // --- v6.0: Water Change Calculator ---
+    // --- Water Change ---
     const wcPercent = userInputs.wcPercent || 0;
     const wcLitres = litres * (wcPercent / 100);
     results.waterChange = {
@@ -86,7 +177,7 @@ function doDosingCalculations() {
         ukGal: wcLitres / UK_GAL_TO_L
     };
 
-    // --- v6.0: Substrate Calculator ---
+    // --- Substrate ---
     if (window.SeachemEngine && allElements.subProduct) {
         const productId = allElements.subProduct.value;
         const subL = userInputs.subLength || 0;
@@ -97,7 +188,7 @@ function doDosingCalculations() {
         results.substrate = { bags: 0, bagsSmall: 0 };
     }
 
-    // --- v6.0: Salt Mix Calculator (UMD module) ---
+    // --- Salt Mix ---
     results.saltMix = null;
     results.saltMixError = '';
     if (typeof SaltMixCalculator !== 'undefined' && allElements.smProduct) {
@@ -113,20 +204,29 @@ function doDosingCalculations() {
                     currentPpt: smCur,
                     desiredPpt: smDes
                 });
+            } else if (smVol > 0 && smDes <= smCur && smDes > 0) {
+                results.saltMixError = 'Salt mix raises salinity only. For lower salinity, do a water change.';
             }
         } catch (e) {
             results.saltMixError = e.message || 'Salt mix calculation error';
         }
     }
 
-    // --- Display Results ---
+    // --- Display ---
     updateAllResults(results);
 }
 
-
 // --- App Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    const calculationSequence = [handleParameterStatusUpdate, doDosingCalculations];
-    initUI(calculationSequence);
-    calculationSequence.forEach(cb => cb());
+    startLoadingScreenBootLog();
+    try {
+        const calculationSequence = [handleParameterStatusUpdate, doDosingCalculations];
+        initUI(calculationSequence);
+        // Run initial calculations after full init
+        calculationSequence.forEach(cb => cb());
+    } catch (error) {
+        console.error('App initialization failed:', error);
+    } finally {
+        dismissLoadingScreen();
+    }
 });

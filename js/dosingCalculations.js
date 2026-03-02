@@ -133,15 +133,15 @@ function calculateSafeGrams(litres) {
  */
 function calculateAptCompleteDose(litres, currentNitrate = 0) {
     const ml = litres * COEFF_APT_80PCT;
-    // Rough estimate: ~1.5 ppm NO3 increase per ml per 100L
-    const estimatedNitrateIncrease = (ml / 100) * APT_NITRATE_EST_PER_ML * 100;
-    // Simplified: per liter dose contributes roughly 0.015 ppm per ml
-    const perLiterContribution = ml * 0.015;
-    const estimatedFinalNitrate = currentNitrate + perLiterContribution;
+    // APT Complete adds ~1.5 ppm NO3 per 1ml per 100L of tank water
+    // For total ml dosed into a tank of `litres` volume:
+    // increase = (ml / litres) * 100 * APT_NITRATE_EST_PER_ML
+    const estimatedNitrateIncrease = litres > 0 ? (ml / litres) * 100 * APT_NITRATE_EST_PER_ML : 0;
+    const estimatedFinalNitrate = currentNitrate + estimatedNitrateIncrease;
 
     return {
         ml: Math.max(0, ml),
-        estimatedNitrateIncrease: Math.max(0, perLiterContribution),
+        estimatedNitrateIncrease: Math.max(0, estimatedNitrateIncrease),
         estimatedFinalNitrate: Math.max(0, estimatedFinalNitrate)
     };
 }

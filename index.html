@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aquarium Calculator v6.0 - Dosing &amp; Parameters</title>
+    <title>Aquarium Calculator v6.1 - Dosing &amp; Parameters</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,44 @@
 </head>
 
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <svg class="running-man" viewBox="0 0 120 120" width="100" height="100">
+                <g fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Head -->
+                    <circle cx="60" cy="22" r="8" fill="var(--primary)" opacity="0.9"/>
+                    <!-- Body -->
+                    <line x1="60" y1="30" x2="58" y2="55" class="rm-body"/>
+                    <!-- Left arm -->
+                    <polyline points="58,38 44,48 38,40" class="rm-larm"/>
+                    <!-- Right arm -->
+                    <polyline points="58,38 72,44 78,36" class="rm-rarm"/>
+                    <!-- Left leg -->
+                    <polyline points="58,55 46,72 40,88" class="rm-lleg"/>
+                    <!-- Right leg -->
+                    <polyline points="58,55 70,70 78,84" class="rm-rleg"/>
+                </g>
+                <!-- Water drops -->
+                <circle cx="30" cy="60" r="3" fill="var(--primary)" opacity="0.3" class="rm-drop rm-drop-1"/>
+                <circle cx="22" cy="50" r="2" fill="var(--primary)" opacity="0.2" class="rm-drop rm-drop-2"/>
+                <circle cx="26" cy="70" r="2.5" fill="var(--primary)" opacity="0.25" class="rm-drop rm-drop-3"/>
+            </svg>
+            <div class="loading-text">
+                <span data-lang-key="loading_title">Aquarium Calculator</span>
+                <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+                <small data-lang-key="loading_subtitle">Initializing water analysis...</small>
+            </div>
+            <div class="loading-log" aria-live="polite" aria-label="API initialization log">
+                <div class="loading-log-header">
+                    <span class="loading-log-indicator"></span>
+                    <span>API Initialization Log</span>
+                </div>
+                <div id="loadingLogStream" class="loading-log-stream"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="bg-decoration">
         <div class="bubble bubble-1"></div>
         <div class="bubble bubble-2"></div>
@@ -27,6 +65,13 @@
                 <div>
                     <h1 data-lang-key="main_title">Aquarium Calculator</h1>
                     <p class="subtitle" data-lang-key="subtitle">Dosing &amp; Water Parameter Analysis</p>
+                    <div class="realtime-beacon header-status-beacon" id="homeStatusBeacon" title="System status: live and no errors">
+                        <span class="beacon-dot"></span>
+                        <span class="beacon-copy">
+                            <span class="beacon-label" data-lang-key="beacon_live">LIVE</span>
+                            <span class="beacon-status" data-lang-key="beacon_ok">No errors</span>
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="header-controls">
@@ -44,10 +89,10 @@
     </header>
 
     <!-- v6.0: Profile Tabs -->
-    <div class="profile-tabs" id="profileTabs">
-        <button class="profile-tab active" data-profile="freshwater" aria-pressed="true">🐟 Freshwater</button>
-        <button class="profile-tab" data-profile="saltwater" aria-pressed="false">🐠 Saltwater</button>
-        <button class="profile-tab" data-profile="pond" aria-pressed="false">🏞️ Pond</button>
+    <div class="profile-tabs" id="profileTabs" role="tablist">
+        <button class="profile-tab active" data-profile="freshwater" role="tab" aria-selected="true">🐟 Freshwater</button>
+        <button class="profile-tab" data-profile="saltwater" role="tab" aria-selected="false">🐠 Saltwater</button>
+        <button class="profile-tab" data-profile="pond" role="tab" aria-selected="false">🏞️ Pond</button>
     </div>
 
     <main class="main-grid">
@@ -89,8 +134,8 @@
                             <div id="statusNitrate" class="status-badge"></div>
                         </div>
 
-                        <!-- Freshwater-only: GH -->
-                        <div class="param-item has-toggle" data-profile="freshwater">
+                        <!-- Freshwater + Pond: GH -->
+                        <div class="param-item has-toggle" data-profile="freshwater pond">
                             <label for="paramGh" data-lang-key="param_gh_label">General Hardness (GH)</label>
                             <div class="input-wrapper">
                                 <input type="number" id="paramGh" min="0" step="1" value="4" class="param-input" inputmode="numeric">
@@ -229,9 +274,25 @@
                     <div class="section-header mini">
                         <div class="section-icon">🚨</div>
                         <h3 data-lang-key="emergency_title">Emergency Recommendations</h3>
+                        <span class="realtime-beacon" id="realtimeBeacon" title="Real-time monitoring active">
+                            <span class="beacon-dot"></span>
+                            <span class="beacon-copy">
+                                <span class="beacon-label" data-lang-key="beacon_live">LIVE</span>
+                                <span class="beacon-status" data-lang-key="beacon_ok">No errors</span>
+                            </span>
+                        </span>
                     </div>
+                    <div id="emergencyLoader" class="emergency-loader" style="display: none;">
+                        <div class="loader-bar"></div>
+                        <span class="loader-text" data-lang-key="scanning_params">Scanning parameters...</span>
+                    </div>
+                    <div id="co2Estimate" class="co2-estimate" style="display: none;"></div>
                     <div id="recommendations" class="recommendations-box">
                         <p data-lang-key="reco_ok">No issues detected.</p>
+                    </div>
+                    <div class="param-history-actions">
+                        <button type="button" id="saveParamsBtn" class="history-btn" data-lang-key="save_reading_btn">Save Reading</button>
+                        <button type="button" id="paramHistoryBtn" class="history-btn secondary" data-lang-key="view_history_btn">History</button>
                     </div>
                 </div>
             </div>
@@ -299,7 +360,7 @@
                 <p id="errors" class="error-message" aria-live="polite" tabindex="-1"></p>
 
                 <!-- Legacy cards (freshwater profile) -->
-                <div class="dosing-card glass-card" id="khco3-card" data-profile="freshwater">
+                <div class="dosing-card glass-card" id="khco3-card" data-profile="freshwater pond">
                     <details id="khco3-details" open>
                         <summary class="dosing-summary">
                             <span class="step-number">2</span>
@@ -312,11 +373,11 @@
                             <div class="input-row">
                                 <div class="input-group">
                                     <label for="khCurrent" data-lang-key="current_kh_label">Current KH (°dKH)</label>
-                                    <input type="number" id="khCurrent" min="0" max="30" step="0.01" value="5.6" required class="styled-input">
+                                    <input type="number" id="khCurrent" min="0" max="30" step="0.01" value="4" required class="styled-input">
                                 </div>
                                 <div class="input-group">
                                     <label for="khTarget" data-lang-key="target_kh_label">Target KH (°dKH)</label>
-                                    <input type="number" id="khTarget" min="0" max="30" step="0.01" value="4.5" required class="styled-input">
+                                    <input type="number" id="khTarget" min="0" max="30" step="0.01" value="6" required class="styled-input">
                                 </div>
                                 <div class="input-group">
                                     <label for="khPurity" data-lang-key="purity_label">Purity (0.5-1.0)</label>
@@ -336,7 +397,7 @@
                     </details>
                 </div>
 
-                <div class="dosing-card glass-card" id="equilibrium-card" data-profile="freshwater">
+                <div class="dosing-card glass-card" id="equilibrium-card" data-profile="freshwater pond">
                     <details id="equilibrium-details">
                         <summary class="dosing-summary">
                             <span class="step-number">3</span>
@@ -369,7 +430,7 @@
                     </details>
                 </div>
 
-                <div class="dosing-card glass-card" id="safe-card">
+                <div class="dosing-card glass-card" id="safe-card" data-profile="freshwater pond">
                     <details>
                         <summary class="dosing-summary">
                             <span class="step-number">4</span>
@@ -555,7 +616,7 @@
                 </div>
 
                 <!-- v6.0: Substrate / Gravel Calculator -->
-                <div class="dosing-card glass-card" id="substrate-card">
+                <div class="dosing-card glass-card" id="substrate-card" data-profile="freshwater pond">
                     <details>
                         <summary class="dosing-summary">
                             <div class="summary-content">
@@ -691,7 +752,7 @@
 
             <div class="menu-section">
                 <h3>About</h3>
-                <p class="menu-version">Aquarium Calculator v6.0</p>
+                <p class="menu-version">Aquarium Calculator v6.1</p>
                 <button id="menuChangelog" class="menu-action-btn small">View Changelog</button>
             </div>
         </div>
@@ -701,7 +762,7 @@
         <div class="footer-content">
             <div class="footer-info">
                 <span id="timestamp" class="timestamp"></span>
-                <span class="version-tag">v6.0</span>
+                <span class="version-tag">v6.1</span>
             </div>
         </div>
     </footer>
@@ -730,12 +791,26 @@
         </div>
     </div>
 
-    <!-- v6.0 script load order -->
+    <!-- Parameter History Modal -->
+    <div id="historyModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-wide">
+            <button id="closeHistory" class="modal-close-btn">&times;</button>
+            <div class="modal-header">
+                <h2 data-lang-key="param_history_title">Parameter History</h2>
+            </div>
+            <div class="modal-body" id="historyBody">
+                <p>No saved readings yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- v6.1 script load order -->
     <script src="js/translations.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/dosingCalculations.js"></script>
     <script src="js/seachemEngine.js"></script>
-    <script src="../Feature_Update/salt-mix-calculator.js"></script>
+    <script src="js/saltMixCalculator.js"></script>
+    <script src="js/recommendationEngine.js"></script>
     <script src="js/uiHandlers.js"></script>
     <script src="js/app.js"></script>
 </body>

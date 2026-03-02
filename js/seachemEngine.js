@@ -249,6 +249,35 @@
         return { primary: clamp0(ml), primaryUnit: 'mL', secondary: clamp0(caps), secondaryUnit: 'caps' };
     }
 
+    // --- Pond-specific calculations ---
+    // Pond Prime: 250 mL treats 10,000 US gallons. Dose = (volGal / 10000) * 250
+    function calcPondPrime(current, target, litres, scale) {
+        const volGal = litToUsGal(litres);
+        const ml = (volGal / 10000) * 250;
+        return { primary: clamp0(ml), primaryUnit: 'mL', secondary: 0, secondaryUnit: '' };
+    }
+
+    // Pond StabilityMax: 500 mL treats 5,000 US gallons. Dose = (volGal / 5000) * 500
+    function calcPondStabilityMax(current, target, litres, scale) {
+        const volGal = litToUsGal(litres);
+        const ml = (volGal / 5000) * 500;
+        return { primary: clamp0(ml), primaryUnit: 'mL', secondary: 0, secondaryUnit: '' };
+    }
+
+    // Pond Alkaline Buffer: same chemistry as Alkaline Buffer, re-uses that formula
+    function calcPondAlkalineBuffer(current, target, litres, scale) {
+        return calcAlkalineBuffer(current, target, litres, scale);
+    }
+
+    // Pond Acid Buffer: 2g per 80L to lower pH by ~0.2. Dose = (litres / 80) * ((curPh - tgtPh) / 0.2) * 2
+    function calcPondAcidBuffer(current, target, litres, scale) {
+        const diff = current - target;
+        if (diff <= 0) return { primary: 0, primaryUnit: 'g', secondary: 0, secondaryUnit: 'tsp' };
+        const grams = (litres / 80) * (diff / 0.2) * 2;
+        const tsp = grams / 5;
+        return { primary: clamp0(round3(grams)), primaryUnit: 'g', secondary: clamp0(round3(tsp)), secondaryUnit: 'tsp' };
+    }
+
     // --- Calculation Router ---
     const CALC_FN_MAP = {
         alkaline_buffer:          calcAlkalineBuffer,
@@ -271,7 +300,11 @@
         flourish_iron:            calcFlourishIron,
         flourish_nitrogen:        calcFlourishNitrogen,
         flourish_phosphorus:      calcFlourishPhosphorus,
-        flourish_potassium:       calcFlourishPotassium
+        flourish_potassium:       calcFlourishPotassium,
+        pond_prime:               calcPondPrime,
+        pond_stability_max:       calcPondStabilityMax,
+        pond_alkaline_buffer:     calcPondAlkalineBuffer,
+        pond_acid_buffer:         calcPondAcidBuffer
     };
 
     function calculate(productId, current, target, litres, scale) {
@@ -317,7 +350,7 @@
 
     // --- Product Configs (data-driven card generation) ---
     // inputType: 'current_target' | 'volume_only'
-    // profile: 'freshwater' | 'saltwater' | 'universal'
+    // profile: 'freshwater' | 'saltwater' | 'pond' | 'universal'
     // baseUnit: native formula unit; unitScales: available scale options (null = no dropdown)
     const PRODUCT_CONFIGS = [
         // --- Universal (shown in all profiles) ---
@@ -429,6 +462,28 @@
             id: 'reef_strontium', title: 'Reef Strontium',
             inputType: 'current_target', profile: 'saltwater',
             baseUnit: 'PPM', unitScales: null, icon: '⭐'
+        },
+
+        // --- Pond ---
+        {
+            id: 'pond_prime', title: 'Pond Prime',
+            inputType: 'volume_only', profile: 'pond',
+            baseUnit: 'PPM', unitScales: null, icon: '🏞️'
+        },
+        {
+            id: 'pond_stability_max', title: 'Pond StabilityMax',
+            inputType: 'volume_only', profile: 'pond',
+            baseUnit: 'PPM', unitScales: null, icon: '🦠'
+        },
+        {
+            id: 'pond_alkaline_buffer', title: 'Pond Alkaline Buffer',
+            inputType: 'current_target', profile: 'pond',
+            baseUnit: 'meq/L', unitScales: ['meq/L', 'dKH', 'PPM'], icon: '⬆️'
+        },
+        {
+            id: 'pond_acid_buffer', title: 'Pond Acid Buffer',
+            inputType: 'current_target', profile: 'pond',
+            baseUnit: 'pH', unitScales: null, icon: '⬇️'
         }
     ];
 
@@ -469,7 +524,7 @@
         },
         pond: {
             paramAmmonia: 0, paramNitrite: 0, paramNitrate: 20,
-            paramKh: 5, paramPh: 7.4, paramTemp: 22,
+            paramGh: 6, paramKh: 5, paramPh: 7.4, paramTemp: 22,
             paramDo: 7.5
         }
     };

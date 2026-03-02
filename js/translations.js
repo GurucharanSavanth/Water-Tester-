@@ -115,7 +115,52 @@ const translations = {
         reco_salinity_check: "Salinity is outside 34–36 PPT. Consider <strong>Salt Mix</strong> or a water change.",
         reco_iron_low: "Iron is low (<0.05 ppm). Consider <strong>Flourish Iron</strong>.",
         reco_potassium_low: "Potassium is low (<5 ppm). Consider <strong>Flourish Potassium</strong>.",
-        reco_do_low: "Dissolved O₂ is low (<5 ppm). Improve <strong>water circulation / aeration</strong>."
+        reco_do_low: "Dissolved O₂ is low (<5 ppm). Improve <strong>water circulation / aeration</strong>.",
+
+        // v6.1 — Cross-parameter & advanced recommendation keys
+        reco_ph_crash_risk_title: "pH Crash Risk",
+        reco_ph_crash_risk: "KH is dangerously low (<2 dKH). The water has very little buffering capacity — pH can crash suddenly, which is lethal to fish. Add a <strong>KH booster</strong> immediately.",
+        reco_co2_low_title: "Low CO₂",
+        reco_co2_low: "Estimated CO₂ ≈ <strong>{co2} mg/L</strong> (below 10). Planted tanks benefit from 15–30 mg/L. Consider CO₂ injection or a liquid carbon supplement.",
+        reco_co2_high_title: "High CO₂",
+        reco_co2_high: "Estimated CO₂ ≈ <strong>{co2} mg/L</strong> (above 35). Fish may gasp at the surface. Increase surface agitation or reduce CO₂ injection.",
+        reco_co2_ok_title: "CO₂ Level",
+        reco_co2_ok: "Estimated CO₂ ≈ <strong>{co2} mg/L</strong> — within the ideal 15–30 mg/L range for planted tanks.",
+        reco_ammonia_toxicity_title: "Ammonia Toxicity Amplified",
+        reco_ammonia_toxicity: "High temperature or pH increases the toxic fraction (NH₃) of total ammonia. This is an <strong>emergency</strong> — perform a large water change and dose Prime immediately.",
+        reco_ca_alk_precip_title: "Precipitation Risk",
+        reco_ca_alk_precip: "Both Calcium (>480 ppm) and Alkalinity (>12 meq/L) are elevated. This can cause calcium carbonate to precipitate, creating a white haze. <strong>Lower one parameter before raising the other.</strong>",
+        reco_mg_ca_ratio_title: "Mg:Ca Ratio",
+        reco_mg_ca_ratio_low: "Magnesium-to-Calcium ratio ({ratio}) is below the ideal 3:1. Low Mg can impair coral calcification. Add <strong>Reef Advantage Magnesium</strong>.",
+        reco_mg_ca_ratio_high: "Magnesium-to-Calcium ratio ({ratio}) is above the ideal 3:1. High Mg can interfere with calcium uptake. Reduce Mg supplementation.",
+        reco_do_temp_crisis_title: "Oxygen Crisis",
+        reco_do_temp_crisis: "Dissolved oxygen is low and water temperature is high — warm water holds less oxygen. <strong>Add emergency aeration</strong> (air stones, surface agitation) immediately.",
+        reco_algae_bloom_title: "Algae Bloom Risk",
+        reco_algae_bloom: "High nitrate (>30 ppm) combined with warm temperatures and elevated pH suggests conditions favorable for an algae bloom. Perform <strong>water changes</strong> to lower nitrate and consider adding pond plants to outcompete algae.",
+        reco_pond_ph_swing_title: "pH Swing Risk",
+        reco_pond_ph_swing: "KH is low (<4 dKH) which provides poor buffering. Ponds are especially vulnerable to large diurnal pH swings driven by photosynthesis and respiration. Add <strong>Pond Alkaline Buffer</strong> to stabilize KH above 4 dKH.",
+        reco_cycle_crash_title: "Cycle Crash",
+        reco_cycle_crash: "Both ammonia AND nitrite are elevated — the biological filter may have crashed. Perform a <strong>50% water change</strong>, dose Prime, and add Stability.",
+        reco_cycle_not_started_title: "Uncycled Tank",
+        reco_cycle_not_started: "Ammonia is present but nitrite and nitrate are near zero — the nitrogen cycle has not started. <strong>Add Seachem Stability</strong> daily and do not add fish yet.",
+        reco_cycle_mid_title: "Cycling In Progress",
+        reco_cycle_mid: "Nitrite is present but ammonia is zero — the cycle is partway through. Continue dosing <strong>Stability</strong> and wait for nitrite to drop.",
+        gh_already_at_target: "GH already at/above target",
+
+        // v6.1 — Real-time beacon & emergency loader
+        beacon_live: "LIVE",
+        beacon_alert: "ALERT",
+        beacon_ok: "No errors",
+        beacon_check: "Check parameters",
+        scanning_params: "Scanning parameters...",
+
+        // v6.1 — Parameter history
+        save_reading_btn: "Save Reading",
+        view_history_btn: "History",
+        param_history_title: "Parameter History",
+
+        // v6.1 — Timestamps
+        last_calc_label: "Last calc"
     },
     kn: {
         main_title: "ಅಕ್ವೇರಿಯಂ ಕ್ಯಾಲ್ಕುಲೇಟರ್",
@@ -228,6 +273,47 @@ const translations = {
         reco_salinity_check: "ಲವಣಾಂಶ 34–36 PPT ವ್ಯಾಪ್ತಿಗಿಂತ ಹೊಡೆಗೆ. <strong>Salt Mix</strong> ಅಥವಾ ನೀರು ಬದಲಾವಣೆ ಪರಿಗಣಿಸಿ.",
         reco_iron_low: "ಇರನ್ ಕಡಿಮೆಯಾಗಿದೆ (<0.05 ppm). <strong>Flourish Iron</strong> ಪರಿಗಣಿಸಿ.",
         reco_potassium_low: "ಪೊಟ್ಯಾಸಿಯಮ್ ಕಡಿಮೆಯಾಗಿದೆ (<5 ppm). <strong>Flourish Potassium</strong> ಪರಿಗಣಿಸಿ.",
-        reco_do_low: "ಕರ೟ ಆಮ್ಯಾಕ್ಸಿಜನ್ ಕಡಿಮೆಯಾಗಿದೆ (<5 ppm). <strong>ನೀರಿನ ಪ್ರವಾಹ / ಗಾಯೀಕರಣ</strong> ಸುಧಾರಿಸಿ."
+        reco_do_low: "ಕರಗಿದ ಆಮ್ಲಜನಕ ಕಡಿಮೆಯಾಗಿದೆ (<5 ppm). <strong>ನೀರಿನ ಪ್ರವಾಹ / ಗಾಳಿಯಾಟ</strong> ಸುಧಾರಿಸಿ.",
+
+        // v6.1 — Cross-parameter keys
+        reco_ph_crash_risk_title: "pH ಕುಸಿತ ಅಪಾಯ",
+        reco_ph_crash_risk: "KH ಅಪಾಯಕಾರಿಯಾಗಿ ಕಡಿಮೆಯಾಗಿದೆ (<2 dKH). ನೀರಿಗೆ ಬಫರಿಂಗ್ ಸಾಮರ್ಥ್ಯ ಕಡಿಮೆ — pH ಹಠಾತ್ ಕುಸಿಯಬಹುದು. <strong>KH ಬೂಸ್ಟರ್</strong> ತಕ್ಷಣ ಸೇರಿಸಿ.",
+        reco_co2_low_title: "ಕಡಿಮೆ CO₂",
+        reco_co2_low: "ಅಂದಾಜು CO₂ ≈ <strong>{co2} mg/L</strong> (10ಕ್ಕಿಂತ ಕಡಿಮೆ). ಸಸ್ಯಯುಕ್ತ ಟ್ಯಾಂಕ್‌ಗಳಿಗೆ 15–30 mg/L ಉತ್ತಮ.",
+        reco_co2_high_title: "ಹೆಚ್ಚಿನ CO₂",
+        reco_co2_high: "ಅಂದಾಜು CO₂ ≈ <strong>{co2} mg/L</strong> (35ಕ್ಕಿಂತ ಹೆಚ್ಚು). ಮೀನುಗಳು ಉಸಿರಾಟ ಕಷ್ಟ ಅನುಭವಿಸಬಹುದು.",
+        reco_co2_ok_title: "CO₂ ಮಟ್ಟ",
+        reco_co2_ok: "ಅಂದಾಜು CO₂ ≈ <strong>{co2} mg/L</strong> — ಸಸ್ಯಯುಕ್ತ ಟ್ಯಾಂಕ್‌ಗಳಿಗೆ 15–30 mg/L ವ್ಯಾಪ್ತಿಯಲ್ಲಿದೆ.",
+        reco_ammonia_toxicity_title: "ಅಮೋನಿಯಾ ವಿಷತ್ವ ಹೆಚ್ಚಳ",
+        reco_ammonia_toxicity: "ಹೆಚ್ಚಿನ ತಾಪಮಾನ ಅಥವಾ pH ಅಮೋನಿಯಾ ವಿಷತ್ವವನ್ನು ಹೆಚ್ಚಿಸುತ್ತದೆ. <strong>ತುರ್ತು</strong> — ದೊಡ್ಡ ನೀರು ಬದಲಾವಣೆ ಮಾಡಿ ಮತ್ತು Prime ಡೋಸ್ ಮಾಡಿ.",
+        reco_ca_alk_precip_title: "ಪ್ರೆಸಿಪಿಟೇಶನ್ ಅಪಾಯ",
+        reco_ca_alk_precip: "ಕ್ಯಾಲ್ಸಿಯಂ (>480 ppm) ಮತ್ತು ಆಲ್ಕಲೈನಿಟಿ (>12 meq/L) ಎರಡೂ ಹೆಚ್ಚಾಗಿವೆ. ಕ್ಯಾಲ್ಸಿಯಂ ಕಾರ್ಬೋನೇಟ್ ಅವಕ್ಷೇಪಿಸಬಹುದು.",
+        reco_mg_ca_ratio_title: "Mg:Ca ಅನುಪಾತ",
+        reco_mg_ca_ratio_low: "Mg:Ca ಅನುಪಾತ ({ratio}) 3:1 ಗಿಂತ ಕಡಿಮೆ. <strong>Reef Advantage Magnesium</strong> ಸೇರಿಸಿ.",
+        reco_mg_ca_ratio_high: "Mg:Ca ಅನುಪಾತ ({ratio}) 3:1 ಗಿಂತ ಹೆಚ್ಚು. Mg ಪೂರಕವನ್ನು ಕಡಿಮೆ ಮಾಡಿ.",
+        reco_do_temp_crisis_title: "ಆಮ್ಲಜನಕ ಬಿಕ್ಕಟ್ಟು",
+        reco_do_temp_crisis: "ಕರಗಿದ ಆಮ್ಲಜನಕ ಕಡಿಮೆ ಮತ್ತು ತಾಪಮಾನ ಹೆಚ್ಚು. <strong>ತುರ್ತು ಗಾಳಿಯಾಟ</strong> ಸೇರಿಸಿ.",
+        reco_algae_bloom_title: "ಪಾಚಿ ಹೂಬಿಡುವ ಅಪಾಯ",
+        reco_algae_bloom: "ಹೆಚ್ಚಿನ ನೈಟ್ರೇಟ್ (>30 ppm) ಬೆಚ್ಚನೆಯ ತಾಪಮಾನ ಮತ್ತು ಹೆಚ್ಚಿನ pH ಜೊತೆ ಪಾಚಿ ಬೆಳವಣಿಗೆಗೆ ಅನುಕೂಲ. <strong>ನೀರು ಬದಲಾವಣೆ</strong> ಮಾಡಿ ಮತ್ತು ಕೊಳ ಸಸ್ಯಗಳನ್ನು ಸೇರಿಸಿ.",
+        reco_pond_ph_swing_title: "pH ಏರಿಳಿತ ಅಪಾಯ",
+        reco_pond_ph_swing: "KH ಕಡಿಮೆ (<4 dKH) ಬಫರಿಂಗ್ ದುರ್ಬಲ. ಕೊಳಗಳಲ್ಲಿ ಹಗಲು-ರಾತ್ರಿ pH ಏರಿಳಿತ ಹೆಚ್ಚು. <strong>Pond Alkaline Buffer</strong> ಸೇರಿಸಿ KH 4 dKH ಮೇಲೆ ಸ್ಥಿರಗೊಳಿಸಿ.",
+        reco_cycle_crash_title: "ಸೈಕಲ್ ಕುಸಿತ",
+        reco_cycle_crash: "ಅಮೋನಿಯಾ ಮತ್ತು ನೈಟ್ರೈಟ್ ಎರಡೂ ಹೆಚ್ಚಾಗಿವೆ. <strong>50% ನೀರು ಬದಲಾವಣೆ</strong> ಮಾಡಿ, Prime ಮತ್ತು Stability ಡೋಸ್ ಮಾಡಿ.",
+        reco_cycle_not_started_title: "ಸೈಕಲ್ ಆರಂಭವಾಗಿಲ್ಲ",
+        reco_cycle_not_started: "ಅಮೋನಿಯಾ ಇದೆ ಆದರೆ ನೈಟ್ರೈಟ್/ನೈಟ್ರೇಟ್ ಶೂನ್ಯ. ನೈಟ್ರೋಜನ್ ಸೈಕಲ್ ಆರಂಭವಾಗಿಲ್ಲ. <strong>Stability</strong> ದಿನನಿತ್ಯ ಡೋಸ್ ಮಾಡಿ.",
+        reco_cycle_mid_title: "ಸೈಕ್ಲಿಂಗ್ ಪ್ರಗತಿಯಲ್ಲಿ",
+        reco_cycle_mid: "ನೈಟ್ರೈಟ್ ಇದೆ ಆದರೆ ಅಮೋನಿಯಾ ಶೂನ್ಯ — ಸೈಕಲ್ ಅರ್ಧದಲ್ಲಿದೆ. <strong>Stability</strong> ಮುಂದುವರಿಸಿ.",
+        gh_already_at_target: "GH ಈಗಾಗಲೇ ಗುರಿಯಲ್ಲಿ/ಮೇಲಿದೆ",
+
+        beacon_live: "ನೇರ",
+        beacon_alert: "ಎಚ್ಚರಿಕೆ",
+        beacon_ok: "ದೋಷಗಳಿಲ್ಲ",
+        beacon_check: "ಪರಿಶೀಲಿಸಿ",
+        scanning_params: "ಪ್ಯಾರಾಮೀಟರ್‌ಗಳನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಲಾಗುತ್ತಿದೆ...",
+
+        save_reading_btn: "ಓದುವಿಕೆ ಉಳಿಸಿ",
+        view_history_btn: "ಇತಿಹಾಸ",
+        param_history_title: "ಪ್ಯಾರಾಮೀಟರ್ ಇತಿಹಾಸ",
+        last_calc_label: "ಕೊನೆಯ ಲೆಕ್ಕಾಚಾರ"
     }
 };

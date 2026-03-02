@@ -50,6 +50,8 @@ const GH_UNIT_KEY = 'gh_unit_v5';
 const KH_UNIT_KEY = 'kh_unit_v5';
 const VOL_MODE_KEY = 'vol_mode_v5';  // 'direct' or 'lbh'
 const DIM_UNIT_KEY = 'dim_unit_v5'; // 'cm', 'in', or 'ft'
+const SUB_UNIT_KEY = 'sub_unit_v6'; // 'cm' or 'in'
+const PARAM_HISTORY_KEY = 'param_history_v6'; // JSON array of timestamped readings
 
 // --- HELPER FUNCTIONS ---
 
@@ -110,7 +112,7 @@ function dimensionsToLitres(length, breadth, height, unit) {
  * @returns {number} The value in degrees of hardness.
  */
 function ppmToDh(ppm) {
-    if (ppm <= 0 || !isFinite(ppm)) return 0;
+    if (ppm < 0 || !isFinite(ppm)) return 0;
     return ppm / PPM_TO_DH;
 }
 
@@ -120,7 +122,7 @@ function ppmToDh(ppm) {
  * @returns {number} The value in parts per million.
  */
 function dhToPpm(dh) {
-    if (dh <= 0 || !isFinite(dh)) return 0;
+    if (dh < 0 || !isFinite(dh)) return 0;
     return dh * PPM_TO_DH;
 }
 
@@ -181,6 +183,47 @@ function applyTheme(theme) {
 
 // v6.0 — Profile localStorage key
 const PROFILE_KEY = 'profile_v6';
+
+/**
+ * Safe clipboard write with fallback for non-secure contexts.
+ * @param {string} text Text to copy
+ * @returns {Promise<boolean>} true if copied successfully
+ */
+function safeClipboardWrite(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).then(function () { return true; }).catch(function () { return fallbackCopy(text); });
+    }
+    return Promise.resolve(fallbackCopy(text));
+}
+
+function fallbackCopy(text) {
+    try {
+        var textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return ok;
+    } catch (e) {
+        return false;
+    }
+}
+
+/**
+ * Escapes a CSV field value (wraps in quotes if contains comma, quote, or newline).
+ * @param {string} val The value to escape
+ * @returns {string}
+ */
+function csvEscape(val) {
+    var s = String(val);
+    if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
+        return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+}
 
 // v6.0 — Convert litres to US gallons
 function toUsGal(litres) {
